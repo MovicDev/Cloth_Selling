@@ -36,7 +36,9 @@ export interface Order {
 export const productApi = {
   getAll: async (): Promise<Product[]> => {
     const response = await fetch(`${API_BASE_URL}/products`);
-    if (!response.ok) throw new Error('Failed to fetch products');
+    if (!response.ok) {
+      console.log('Failed to create product', await response.text());
+    }
     return response.json();
   },
 

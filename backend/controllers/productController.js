@@ -58,7 +58,8 @@ async function deleteProduct(req, res) {
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete product' });
+    // res.status(500).json({ error: 'Failed to delete product' });
+    console.error('De Error deleting product:', error);
   }
 }
 
