@@ -1,0 +1,6 @@
+{
+  "name": "Premium Fabric Showroom",
+  "description": "A cinematic, luxury-inspired digital showroom for premium fabrics and tailoring materials with seamless WhatsApp ordering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

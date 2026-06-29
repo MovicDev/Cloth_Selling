@@ -1,0 +1,48 @@
+{
+  "products": [
+    {
+      "id": "royal-gold-emperor-ankara",
+      "name": "Royal Gold Emperor Ankara",
+      "pricePerYard": 12,
+      "category": "Ankara Fabrics",
+      "description": "A breathtaking, high-density 100% premium African wax print. Embellished with fine golden outlines that trace majestic monarch and organic patterns, this fabric provides a rigid structure that holds pleats beautifully. Perfect for premium native wear dresses, customized corporate ensembles, and headwraps.",
+      "images": [
+        "https://images.unsplash.com/photo-1597484662317-9bd7edd32d18?q=80&w=800",
+        "https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=800",
+        "https://images.unsplash.com/photo-1582236940843-ef7213ee44e1?q=80&w=800"
+      ],
+      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-african-woman-elegantly-walking-in-traditional-dress-34440-large.mp4",
+      "colors": ["Gold & Maroon", "Teal & Yellow", "Royal Blue & Gold"],
+      "width": "46 inches (1.17m)",
+      "suitableUses": ["Native wear gowns", "Sophisticated kaftans", "Aso-Ebi Uniforms", "Blazers", "Premium headties/geles"],
+      "isNewArrival": true,
+      "isBestSeller": true,
+      "isFeatured": true,
+      "inStock": true,
+      "viewsCount": 342
+    },
+    {
+      "id": "imperial-cashmere-senator",
+      "name": "Imperial Cashmere Senator",
+      "pricePerYard": 22,
+      "category": "Senator Materials",
+      "description": "Woven in Yorkshire mills with a premium wool-cashmere blend, this fabric of sovereign standards has a flawless, smooth finish that cascades into pristine tailor lines.",
+      "images": [
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800",
+        "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=800"
+      ],
+      "colors": ["Charcoal Grey", "Navy Blue", "Champagne Beige", "material Olive"],
+      "width": "60 inches (1.52m)",
+      "suitableUses": ["Senator outfits", "Traditional attire for men", "Two-piece kaftans"],
+      "isNewArrival": true,
+      "isBestSeller": true,
+      "isFeatured": true,
+      "inStock": true,
+      "viewsCount": 498
+    }
+  ],
+  "orders": [],
+  "settings": {
+    "brandWhatsApp": "2349016504151"
+  }
+}
