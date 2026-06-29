@@ -24,7 +24,7 @@ export default function ProductCard({ product, currency, onSelect, onQuickOrder 
       style={{ contentVisibility: 'auto' }}
     >
       {/* Visual Image Showcase Container */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer" onClick={() => onSelect(product)}>
+      <div className="relative aspect-3/4 overflow-hidden bg-gray-100 cursor-pointer" onClick={() => onSelect(product)}>
         
         {/* Fabric Fold Images Layer (Cycles on hover of chips or direct hover) */}
         <img
@@ -35,7 +35,7 @@ export default function ProductCard({ product, currency, onSelect, onQuickOrder 
         />
 
         {/* Shadow overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-70 group-hover:opacity-85 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/10 opacity-70 group-hover:opacity-85 transition-opacity duration-300" />
 
         {/* Tag Status Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10 font-mono text-[9px] uppercase tracking-wider">

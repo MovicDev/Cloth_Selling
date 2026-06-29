@@ -92,7 +92,7 @@ export default function ProductDetails({
           
           {/* Column 1: Gallery Showcase (5 Columns) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="relative aspect-[4/5] overflow-hidden bg-white border border-gray-100 shadow-sm">
+            <div className="relative aspect-4/5 overflow-hidden bg-white border border-gray-100 shadow-sm">
               <img
                 src={selectedImage}
                 alt={product.name}
@@ -111,7 +111,7 @@ export default function ProductDetails({
                 <button
                   key={mIdx}
                   onClick={() => setSelectedImage(imgUrl)}
-                  className={`aspect-[4/5] overflow-hidden border transition-all ${selectedImage === imgUrl ? 'border-gold ring-1 ring-gold/20' : 'border-gray-200 hover:border-gold/50'}`}
+                  className={`aspect-4/5 overflow-hidden border transition-all ${selectedImage === imgUrl ? 'border-gold ring-1 ring-gold/20' : 'border-gray-200 hover:border-gold/50'}`}
                   id={`thumbnail-preview-${mIdx}`}
                 >
                   <img
@@ -207,7 +207,7 @@ export default function ProductDetails({
                 <div className="space-y-3">
                   <p>{product.description}</p>
                   <div className="flex gap-2 items-center bg-gold/5 p-3 rounded-none border border-gold/10">
-                    <Sparkles className="w-4 h-4 text-gold flex-shrink-0" />
+                    <Sparkles className="w-4 h-4 text-gold shrink-0" />
                     <p className="font-mono text-[11px] text-gold font-medium">Bespoke Guarantee: Color does not run. Woven with double-twisted fiber counts.</p>
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export default function ProductDetails({
 
                 {/* Outfit Selector helper hint details */}
                 <div className="font-sans text-xs text-gray-500 bg-[#FAF9F6] p-3 border-l-2 border-gold flex items-start gap-2 leading-relaxed">
-                  <Scissors className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+                  <Scissors className="w-4 h-4 text-gold shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-gray-850">Outfit Recommendation: </span>
                     <span>{getYardageAdvice(yardage)}</span>
@@ -370,7 +370,7 @@ export default function ProductDetails({
                     onClick={() => onSelectProduct(relProduct)}
                     className="group border border-gray-100 hover:shadow-lg transition-all cursor-pointer bg-white"
                   >
-                    <div className="aspect-[3/4] overflow-hidden bg-gray-55 relative">
+                    <div className="aspect-3/4 overflow-hidden bg-gray-55 relative">
                       <img
                         src={relProduct.images[0]}
                         alt={relProduct.name}

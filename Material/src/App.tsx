@@ -321,7 +321,7 @@ export default function App() {
                 </div>
 
                 <div className="lg:col-span-7 grid grid-cols-2 gap-4">
-                  <div className="relative aspect-[3/4] overflow-hidden">
+                  <div className="relative aspect-3/4 overflow-hidden">
                     <img
                       src="https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=500"
                       alt="Senator wear fit"
@@ -332,7 +332,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="relative aspect-[3/4] mt-8 overflow-hidden">
+                  <div className="relative aspect-3/4 mt-8 overflow-hidden">
                     <img
                       src="https://images.unsplash.com/photo-1582236940843-ef7213ee44e1?q=80&w=500"
                       alt="Ankara native dress"

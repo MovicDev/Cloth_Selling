@@ -90,7 +90,7 @@ Thank you.`;
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-[100] backdrop-blur-sm select-none" id="order-modal-backdrop">
+    <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-100 backdrop-blur-sm select-none" id="order-modal-backdrop">
       <div 
         className="bg-white w-full max-w-lg shadow-2xl relative flex flex-col max-h-[90vh]" 
         onClick={(e) => e.stopPropagation()}
@@ -224,7 +224,7 @@ Thank you.`;
           </div>
 
           <div className="bg-[#FAF9F6] p-4 border border-gray-100 flex items-start gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+            <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
             <p className="text-[11px] text-gray-500 leading-normal">
               <strong>Security Protocol:</strong> Submitting compiles these details into a pre-structured luxury invoice, stores it in browser cache for tracking, and safely forwards you to WhatsApp. Your privacy is fully respected.
             </p>

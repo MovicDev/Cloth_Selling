@@ -193,7 +193,7 @@ export default function Navbar({
 
       {/* Floating Interactive Search Bar Panel */}
       {isSearchOpen && (
-        <div className="absolute left-0 right-0 top-[100%] bg-white border-b border-gray-100 shadow-lg px-6 md:px-12 py-5 z-40 transition-all">
+        <div className="absolute left-0 right-0 top-full bg-white border-b border-gray-100 shadow-lg px-6 md:px-12 py-5 z-40 transition-all">
           <div className="max-w-3xl mx-auto relative">
             <div className="flex items-center border-b-2 border-gold py-2">
               <Search className="w-5 h-5 text-gray-400 mr-3" />
@@ -264,7 +264,7 @@ export default function Navbar({
 
       {/* Mobile Menu Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute left-0 right-0 top-[100%] bg-white border-b border-gray-100 shadow-lg px-6 py-6 z-40 transition-transform">
+        <div className="md:hidden absolute left-0 right-0 top-full bg-white border-b border-gray-100 shadow-lg px-6 py-6 z-40 transition-transform">
           <div className="flex flex-col space-y-4">
             <button
               onClick={() => handleLinkClick('home')}
