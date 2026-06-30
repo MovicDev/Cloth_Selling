@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
-const Admin = require('./models/Admin');
+const Admin = require('../models/Admin');
 
 const DataBase_API = process.env.MONGODB_URI;
 
