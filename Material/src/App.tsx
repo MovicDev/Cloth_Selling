@@ -1,12 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Sparkles, SlidersHorizontal, ArrowUpDown, Undo2, Filter, Info, 
-  CheckCircle2, AlertCircle, Phone, Clock, MessageCircle 
+  Filter, Info, MessageCircle 
 } from 'lucide-react';
 
 // Core Sub-components
@@ -37,7 +32,7 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [brandWhatsApp, setBrandWhatsApp] = useState<string>('2348031234567'); // Configurable owner route
+  const [brandWhatsApp, setBrandWhatsApp] = useState<string>('2349016504151'); // Configurable owner route
 
   // Showroom Filter variables
   const [filterCategory, setFilterCategory] = useState<string | null>(null);

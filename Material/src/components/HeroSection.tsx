@@ -116,7 +116,8 @@ export default function HeroSection({ collections, onExplore, brandWhatsApp }: H
                 />
                 
                 {/* Visual shade overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
+                <div className="absolute inset-0 bg-black/50 transition-opacity duration-300 group-hover:bg-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 
                 <div className="absolute inset-0 p-6 flex flex-col justify-end text-left space-y-2 relative z-10">
                   <span className="font-bold text-[9px] uppercase tracking-widest text-gold bg-gold/15 border border-gold/10 px-2 py-0.5 rounded-full w-max">

@@ -31,9 +31,22 @@ export default function AdminDashboard({
   setBrandWhatsApp,
 }: AdminDashboardProps) {
   // Authorization State
+  const [username, setUsername] = useState('');
   const [passcode, setPasscode] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [adminId, setAdminId] = useState('');
+  const [authToken, setAuthToken] = useState('');
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+
+  // Password Change State
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [passwordChangeError, setPasswordChangeError] = useState('');
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Tab State
   const [adminTab, setAdminTab] = useState<'inventory' | 'orders' | 'settings'>('inventory');
@@ -63,18 +76,97 @@ export default function AdminDashboard({
   // Global Promotion Markup state
   const [promotionalDiscount, setPromotionalDiscount] = useState<number>(0); // e.g. 10 for 10% off
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passcode.toLowerCase() === 'admin' || passcode === '1234') {
-      setIsAuthorized(true);
-      setAuthError('');
-    } else {
-      setAuthError('Incorrect authentication keycode. Please try "admin" or bypass.');
+
+
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoginLoading(true);
+  setAuthError('');
+
+  try {
+    const response = await fetch(`https://cloth-selling.onrender.com/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password: passcode })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setAuthError(data.error || 'Login failed');
+      setIsLoginLoading(false);
+      return;
     }
-  };
+
+    setIsAuthorized(true);
+    setAdminId(data.admin.id);
+    setAuthToken(data.token);
+    localStorage.setItem('adminToken', data.token);
+    localStorage.setItem('adminId', data.admin.id);
+    setAuthError('');
+    setUsername('');
+    setPasscode('');
+  } catch (error) {
+    console.error('Login error:', error);
+    setAuthError('Connection error. Please check your backend.');
+  } finally {
+    setIsLoginLoading(false);
+  }
+};
 
   const handleBypass = () => {
     setIsAuthorized(true);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordChangeError('');
+    setPasswordChangeSuccess('');
+
+    if (newPassword !== newPasswordConfirm) {
+      setPasswordChangeError('New passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      setPasswordChangeError('Password must be at least 4 characters');
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/change-password/${adminId}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ oldPassword, newPassword })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPasswordChangeError(data.error || 'Failed to change password');
+        setIsChangingPassword(false);
+        return;
+      }
+
+      setPasswordChangeSuccess('Password changed successfully!');
+      setOldPassword('');
+      setNewPassword('');
+      setNewPasswordConfirm('');
+      setTimeout(() => {
+        setShowChangePassword(false);
+        setPasswordChangeSuccess('');
+      }, 2000);
+    } catch (error) {
+      console.error('Password change error:', error);
+      setPasswordChangeError('Connection error. Please try again.');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleEditClick = (p: Product) => {
@@ -114,6 +206,12 @@ export default function AdminDashboard({
     setInStock(true);
     setUploadedImages([]);
     setVideoUrl('');
+  };
+
+  const handleLogoutAndClear = () => {
+    setIsAuthorized(false);
+    setUsername('');
+    setPasscode('');
   };
 
   const handleCloudinaryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,15 +417,25 @@ export default function AdminDashboard({
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5 text-left">
-              <label className="font-mono text-xs text-gray-500 block">Owner Access Passcode</label>
+              <label className="font-mono text-xs text-gray-500 block">Username</label>
+              <input
+                type="text"
+                placeholder="Enter username..."
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full border border-gray-200 px-4 py-3 text-sm focus:border-gold focus:outline-none text-center rounded-none font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5 text-left">
+              <label className="font-mono text-xs text-gray-500 block">Password</label>
               <input
                 type="password"
-                placeholder="Enter passcode key..."
+                placeholder="Enter password..."
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 className="w-full border border-gray-200 px-4 py-3 text-sm focus:border-gold focus:outline-none text-center rounded-none font-mono"
               />
-              <span className="font-mono text-[9px] text-gray-400 block mt-1">Hint: Defaults to "admin" or "1234" for preview</span>
             </div>
 
             {authError && (
@@ -336,10 +444,11 @@ export default function AdminDashboard({
 
             <button
               type="submit"
-              className="w-full py-3 bg-black text-white border border-black font-mono text-xs uppercase tracking-[0.2em] hover:bg-transparent hover:text-black transition-all cursor-pointer"
+              disabled={isLoginLoading}
+              className="w-full py-3 bg-black text-white border border-black font-mono text-xs uppercase tracking-[0.2em] hover:bg-transparent hover:text-black transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               id="admin-login-btn"
             >
-              Verify Credentials
+              {isLoginLoading ? 'Verifying...' : 'Verify Credentials'}
             </button>
           </form>
 
@@ -381,7 +490,15 @@ export default function AdminDashboard({
 
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => setIsAuthorized(false)}
+              onClick={() => {
+                setIsAuthorized(false);
+                setUsername('');
+                setPasscode('');
+                setAdminId('');
+                setAuthToken('');
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminId');
+              }}
               className="px-4 py-2 border border-gray-200 hover:border-red-400 hover:text-red-500 bg-white font-mono text-xs uppercase tracking-wider transition-all"
               id="admin-lock-btn"
             >
@@ -391,10 +508,10 @@ export default function AdminDashboard({
         </div>
 
         {/* Dynamic Admin Sub-Navigation Menu */}
-        <div className="flex border-b border-gray-200 bg-white shadow-sm p-1.5 gap-2" id="admin-tab-bar">
+        <div className="flex flex-col sm:flex-row border-b border-gray-200 bg-white shadow-sm p-1.5 gap-2 overflow-x-auto" id="admin-tab-bar">
           <button
             onClick={() => setAdminTab('inventory')}
-            className={`font-mono text-xs uppercase px-5 py-3 tracking-widest flex items-center gap-2 transition-all cursor-pointer ${adminTab === 'inventory' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
+            className={`font-mono text-xs uppercase px-4 py-3 sm:px-5 tracking-widest flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${adminTab === 'inventory' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
             id="admin-tab-inventory-btn"
           >
             <Tag className="w-4 h-4 text-gold" />
@@ -403,7 +520,7 @@ export default function AdminDashboard({
           
           <button
             onClick={() => setAdminTab('orders')}
-            className={`font-mono text-xs uppercase px-5 py-3 tracking-widest flex items-center gap-2 transition-all cursor-pointer ${adminTab === 'orders' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
+            className={`font-mono text-xs uppercase px-4 py-3 sm:px-5 tracking-widest flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${adminTab === 'orders' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
             id="admin-tab-orders-btn"
           >
             <ListOrdered className="w-4 h-4 text-gold" />
@@ -412,7 +529,7 @@ export default function AdminDashboard({
 
           <button
             onClick={() => setAdminTab('settings')}
-            className={`font-mono text-xs uppercase px-5 py-3 tracking-widest flex items-center gap-2 transition-all cursor-pointer ${adminTab === 'settings' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
+            className={`font-mono text-xs uppercase px-4 py-3 sm:px-5 tracking-widest flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${adminTab === 'settings' ? 'bg-black text-white font-bold' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
             id="admin-tab-settings-btn"
           >
             <Laptop className="w-4 h-4 text-gold" />
@@ -422,10 +539,10 @@ export default function AdminDashboard({
 
         {/* TAB 1: PRODUCT CATALOG CRUD GALAXY */}
         {adminTab === 'inventory' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 lg:gap-10">
             
-            {/* Create or Edit Form Sub-section (5 Gird Columns) */}
-            <div className="lg:col-span-5 space-y-6">
+            {/* Create or Edit Form Sub-section (5 Grid Columns) */}
+            <div className="xl:col-span-5 lg:col-span-6 space-y-6">
               <div className="bg-white border border-gray-100 p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                   <h3 className="font-display font-bold text-base text-gray-900 tracking-wide uppercase flex items-center gap-2">
@@ -455,7 +572,7 @@ export default function AdminDashboard({
                   </div>
 
                   {/* Dual Grid block */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-gray-400 block">Price per Yard (#) *</label>
                       <input
@@ -545,7 +662,7 @@ export default function AdminDashboard({
                       <div className="space-y-2 bg-white p-3 border border-gray-150">
                         <span className="font-mono text-[9px] text-gray-400 uppercase tracking-widest block font-bold">Cloudinary Hosted Asset Roll ({uploadedImages.length})</span>
                         
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {uploadedImages.map((imgUrl, iIdx) => (
                             <div key={iIdx} className="relative aspect-square border border-gray-200 group/thumb">
                               <img
@@ -663,7 +780,7 @@ export default function AdminDashboard({
                   </div>
 
                   {/* Colors and Width */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-gray-400 block">Colors (comma separated)</label>
                       <input
@@ -703,7 +820,7 @@ export default function AdminDashboard({
                   <div className="bg-[#FAF9F6] p-4 space-y-3.5 border border-gray-150">
                     <p className="text-gray-400 uppercase tracking-widest text-[9px] font-bold pb-1 border-b border-gray-200">Catalog Badging & Stock Availability</p>
                     
-                    <div className="grid grid-cols-2 gap-4 text-[10px]">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 text-[10px]">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -768,7 +885,7 @@ export default function AdminDashboard({
                 <p className="text-gray-400 text-[11px] leading-relaxed">
                   Apply a global percent discount to all listed catalog items. Handy for holiday assemblies or end-of-season clearance.
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="number"
                     min={0}
@@ -780,7 +897,7 @@ export default function AdminDashboard({
                   />
                   <button
                     onClick={handleApplyPromo}
-                    className="bg-black text-white border border-black px-4 py-2 uppercase tracking-wider text-[11px] hover:bg-transparent hover:text-black transition-all cursor-pointer"
+                    className="w-full sm:w-auto bg-black text-white border border-black px-4 py-2 uppercase tracking-wider text-[11px] hover:bg-transparent hover:text-black transition-all cursor-pointer"
                   >
                     Apply Bulk
                   </button>
@@ -789,7 +906,7 @@ export default function AdminDashboard({
             </div>
 
             {/* Read Catalog Grid with Inline Toggles (7 Grid Columns) */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="xl:col-span-7 lg:col-span-6 space-y-4">
               <div className="bg-white border border-gray-100 p-6 shadow-sm">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
                   <h3 className="font-display font-bold text-base text-gray-900 tracking-wide uppercase">
@@ -798,7 +915,7 @@ export default function AdminDashboard({
                   <span className="font-mono text-[10px] text-gray-400">Manage stock and price metrics</span>
                 </div>
 
-                <div className="space-y-4 max-h-[85vh] overflow-y-auto pr-1">
+                <div className="space-y-4 max-h-[60vh] sm:max-h-[85vh] overflow-y-auto pr-1">
                   {products.map((p) => (
                     <div
                       key={p.id}
@@ -882,10 +999,10 @@ export default function AdminDashboard({
                 <p className="font-mono text-[10px] text-gray-400">Track local submissions that were routed to WhatsApp</p>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={handleExportCSV}
-                  className="px-4 py-2 border border-black hover:border-gold hover:text-gold font-mono text-xs uppercase tracking-wider flex items-center gap-1.5 bg-white transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 border border-black hover:border-gold hover:text-gold font-mono text-xs uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5 bg-white transition-all cursor-pointer"
                   id="admin-export-csv"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
@@ -978,27 +1095,114 @@ export default function AdminDashboard({
 
         {/* TAB 3: SHOWROOM CONFIGURATION */}
         {adminTab === 'settings' && (
-          <div className="bg-white border border-gray-100 p-8 shadow-sm max-w-2xl space-y-6">
+          <div className="bg-white border border-gray-100 p-6 sm:p-8 shadow-sm max-w-2xl mx-auto space-y-6">
             <h3 className="font-display font-bold text-base text-gray-900 tracking-wide uppercase border-b border-gray-100 pb-3">
               Configure Showroom Details
             </h3>
 
             <div className="space-y-4 text-xs font-mono">
+              {/* Change Admin Password */}
+              <div className="bg-blue-50 p-6 border border-blue-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-gray-900 flex items-center gap-1">
+                    <Lock className="w-4 h-4 text-blue-600" />
+                    <span>Change Admin Password</span>
+                  </p>
+                  {showChangePassword && (
+                    <button
+                      onClick={() => {
+                        setShowChangePassword(false);
+                        setPasswordChangeError('');
+                        setOldPassword('');
+                        setNewPassword('');
+                        setNewPasswordConfirm('');
+                      }}
+                      className="text-[10px] text-gray-500 hover:text-gray-700"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {!showChangePassword ? (
+                  <button
+                    onClick={() => setShowChangePassword(true)}
+                    className="w-full px-4 py-2 bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 uppercase tracking-wider text-[10px] transition-all cursor-pointer"
+                  >
+                    Update Password
+                  </button>
+                ) : (
+                  <form onSubmit={handleChangePassword} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-gray-600 block font-semibold text-[10px]">Current Password</label>
+                      <input
+                        type="password"
+                        placeholder="Enter your current password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        required
+                        className="w-full border border-gray-200 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none text-gray-800"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-gray-600 block font-semibold text-[10px]">New Password</label>
+                      <input
+                        type="password"
+                        placeholder="Enter new password (min 4 characters)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        className="w-full border border-gray-200 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none text-gray-800"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-gray-600 block font-semibold text-[10px]">Confirm New Password</label>
+                      <input
+                        type="password"
+                        placeholder="Confirm new password"
+                        value={newPasswordConfirm}
+                        onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                        required
+                        className="w-full border border-gray-200 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none text-gray-800"
+                      />
+                    </div>
+
+                    {passwordChangeError && (
+                      <p className="text-xs text-red-600 bg-red-50 p-2">{passwordChangeError}</p>
+                    )}
+
+                    {passwordChangeSuccess && (
+                      <p className="text-xs text-green-600 bg-green-50 p-2">{passwordChangeSuccess}</p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isChangingPassword}
+                      className="w-full px-4 py-2 bg-green-600 text-white border border-green-600 hover:bg-green-700 uppercase tracking-wider text-[10px] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isChangingPassword ? 'Updating...' : 'Confirm Change Password'}
+                    </button>
+                  </form>
+                )}
+              </div>
+
               {/* WhatsApp Config */}
               <div className="space-y-1.5">
                 <label className="text-gray-400 block font-semibold">Active Owner WhatsApp Number *</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 2348031234567"
+                    placeholder="e.g. 2349016504151"
                     value={brandWhatsApp}
                     onChange={(e) => setBrandWhatsApp(e.target.value.replace(/\+/g, '').replace(/ /g, ''))}
                     className="w-full border border-gray-200 px-3 py-2 text-sm focus:border-gold focus:outline-none text-gray-800"
                   />
                 </div>
                 <span className="text-[10px] text-gray-400 block mt-1">
-                  Enter country code without the '+' or spaces (e.g., "2348031234567" for Nigeria).
+                  Enter country code without the '+' or spaces (e.g., "2349016504151" for Nigeria).
                 </span>
               </div>
 
